@@ -7,8 +7,6 @@ from absl import logging
 import tensorflow as tf
 from ml_metadata.proto import metadata_store_pb2
 
-from autogpt import configurator
-
 
 @click.command()
 @click.option('--pipeline_name', type=str, required=True)

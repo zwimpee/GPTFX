@@ -12,8 +12,6 @@ config_generator_component = create_container_component(
         'python',
         'gptfx',
         'config_gen',
-        '–autogpt_config_uri', InputUriPlaceholder('autogpt_config'),
-        '-ai_config_uri', InputUriPlaceholder('ai_config'),
         '--pipeline_name', InputValuePlaceholder('pipeline_name'),
         '--pipeline_root', InputValuePlaceholder('pipeline_root'),
         '--data_root', InputValuePlaceholder('data_root'),
@@ -39,12 +37,11 @@ config_generator_component = create_container_component(
 
 autogpt_component = create_container_component(
     name='autogpt_component',
-    image='autogpt_component:latest',
+    image='auto-gpt:latest',
     command=[
         'python',
         '-m',
         'autogpt',
-        'ai_config_uri', InputUriPlaceholder('pipeline_config.ai_config'),
     ],
     inputs={
         'pipeline_config': gptfx.pipeline.configs.Config,

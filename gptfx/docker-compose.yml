@@ -6,30 +6,55 @@ version: "3.9"
 services:
   gptfx:
     depends_on:
+      - config_container
       - auto-gpt
-      - tfx
+      - output_container
     build: .
     volumes:
       - ./:/app
-    profiles: ["exclude-from-up"]
-
-  redis:
-    image: "redis/redis-stack-server:latest"
+    profiles: [
+      "exclude-from-up",
+    ]
 
   auto-gpt:
-    image: "significantgravitas/auto-gpt:latest"
-    build: .
-    env_file:
-      - .env
+    depends_on:
+      - redis
+    build: ./
+    tty: true
     environment:
       MEMORY_BACKEND: ${MEMORY_BACKEND:-redis}
       REDIS_HOST: ${REDIS_HOST:-redis}
     volumes:
-      - ./:/app
-    command: ["python", "app.py"]
-    ports:
-      - "5000:5000"
-    profiles: ["exclude-from-up"]
+      - ./:/app/auto-gpt
+
+  config_container:
+    image: "tensorflow/tfx_base:latest"
+    volumes:
+      - ./:/app/config
+    profiles: [
+      "exclude-from-up",
+    ]
+    command: [
+      "python",
+      "-m",
+      "config_generator.py"
+    ]
+
+  output_container:
+    image: "tensorflow/tfx_base:latest"
+    volumes:
+      - ./:/app/output
+    profiles: [
+      "exclude-from-up",
+    ]
+    command: [
+      "python",
+      "-m",
+      "output_processing.py"
+    ]
+
+  redis:
+    image: "redis/redis-stack-server:latest"
 
   tfx:
     image: "tensorflow/tfx_base:latest"

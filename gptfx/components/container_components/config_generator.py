@@ -24,21 +24,23 @@ from autogpt import configurator
 @click.option('--browser_name', type=str, required=False)
 @click.option('--allow_downloads', type=bool, required=False)
 @click.option('--skip_news', type=bool, required=False)
+@click.pass_context
 def main(
-    pipeline_name,
-    pipeline_root: str,
-    continuous: bool,
-    continuous_limit: int,
-    ai_settings_file: str,
-    skip_reprompt: bool,
-    speak: bool,
-    debug: bool,
-    gpt3only: bool,
-    gpt4only: bool,
-    memory_type: str,
-    browser_name: str,
-    allow_downloads: bool,
-    skip_news: bool
+    ctx: click.Context = None,
+    pipeline_name = None,
+    pipeline_root: str = None,
+    continuous: bool = None,
+    continuous_limit: int = None,
+    ai_settings_file: str = None,
+    skip_reprompt: bool = None,
+    speak: bool = None,
+    debug: bool = None,
+    gpt3only: bool = None,
+    gpt4only: bool = None,
+    memory_type: str = None,
+    browser_name: str = None,
+    allow_downloads: bool = None,
+    skip_news: bool = None
 ) -> None:
     logging.basicConfig(level=logging.INFO)
     logging.info('Generating pipeline config for %s', pipeline_name)
