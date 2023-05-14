@@ -1,0 +1,36 @@
+# To boot the app run the following:
+# docker-compose run auto-gpt
+# NOTE: Version 3.9 requires at least docker-compose version 1.29.0 !
+version: "3.9"
+
+services:
+  gptfx:
+    depends_on:
+      - auto-gpt
+      - tfx
+    build: .
+    volumes:
+      - ./:/app
+    profiles: ["exclude-from-up"]
+
+  redis:
+    image: "redis/redis-stack-server:latest"
+
+  auto-gpt:
+    image: "significantgravitas/auto-gpt:latest"
+    build: .
+    env_file:
+      - .env
+    environment:
+      MEMORY_BACKEND: ${MEMORY_BACKEND:-redis}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+    volumes:
+      - ./:/app
+    command: ["python", "app.py"]
+    ports:
+      - "5000:5000"
+    profiles: ["exclude-from-up"]
+
+  tfx:
+    image: "tensorflow/tfx_base:latest"
+
