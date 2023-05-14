@@ -1,67 +1,40 @@
-# To boot the app run the following:
-# docker-compose run auto-gpt
-# NOTE: Version 3.9 requires at least docker-compose version 1.29.0 !
 version: "3.9"
-
 services:
   gptfx:
     depends_on:
       - config_container
       - auto-gpt
       - output_container
-    build:
-      dockerfile: Dockerfile
-      context: ../
+    build: .
     volumes:
-      - ./:/app/gptfx
-    profiles: [
-      "exclude-from-up",
-    ]
-
-  auto-gpt:
-    depends_on:
-      - redis
-    build:
-      dockerfile: ./Dockerfile
-      context: ../
-    tty: true
-    env_file:
-      - ../.env
-    environment:
-      MEMORY_BACKEND: ${MEMORY_BACKEND:-redis}
-      REDIS_HOST: ${REDIS_HOST:-redis}
-    volumes:
-      - ./:/app/auto-gpt
-
+      - ./:/app
   config_container:
-    image: "tensorflow/tfx_base:latest"
-    volumes:
-      - ./:/app/config
-    profiles: [
-      "exclude-from-up",
-    ]
+    build: .
     command: [
       "python",
       "-m",
       "config_generator.py"
     ]
-
+  auto-gpt:
+    build: .
+    depends_on:
+      - config_container
+    command: [
+        "python",
+        "-m",
+        "auto-gpt"
+      ]
   output_container:
-    image: "tensorflow/tfx_base:latest"
+    depends_on:
+      - auto-gpt
+    build: .
     volumes:
-      - ./:/app/output
-    profiles: [
-      "exclude-from-up",
-    ]
+      - ./:/app
     command: [
       "python",
       "-m",
       "output_processing.py"
     ]
-
   redis:
     image: "redis/redis-stack-server:latest"
-
-  tfx:
-    image: "tensorflow/tfx_base:latest"
 
