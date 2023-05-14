@@ -47,7 +47,7 @@ WORKDIR /app/gptfx/components/container_components
 
 # Config generator component
 FROM container_component_base as config_generator_component
-COPY container_components/config_generator_component.py .
+COPY container_components/config_generator.py .
 ENTRYPOINT ["python", "config_generator.py"]
 
 # Output processing component
