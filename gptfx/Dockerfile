@@ -2,6 +2,24 @@
 ARG BUILD_TYPE=dev
 
 FROM significantgravitas/auto-gpt:latest as autogpt-base
+FROM tensorflow/tfx_base:latest as tfx-base
+
+FROM tensorflow/tfx_base:latest as gptfx_base
+
+WORKDIR ..
+
+# Copy the requirements.txt file from the app folder into the image
+COPY --from= requirements.txt .
+
+# Set environment variables
+ENV PIP_NO_CACHE_DIR=yes \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# Update pip and install the required python packages globally
+ENV PATH="$PATH:/root/.local/bin"
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 FROM autogpt-base as auto-gpt
 
@@ -26,38 +44,19 @@ FROM gptfx_base as container_component_base
 
 WORKDIR /app/gptfx/components/container_components
 
+# Config generator component
 FROM container_component_base as config_generator_component
 
 COPY container_components/config_generator_component.py .
 
 ENTRYPOINT ["python", "config_generator.py"]
 
+# Output processing component
 FROM container_component_base as output_processing_component
 
 COPY container_components/output_processing_component.py .
 
 ENTRYPOINT ["python", "output_processing_component.py"]
-
-
-
-FROM tensorflow/tfx_base:latest as gptfx_base
-
-WORKDIR /app
-
-# Copy the requirements.txt file from the app folder into the image
-COPY requirements.txt .
-
-# Set environment variables
-ENV PIP_NO_CACHE_DIR=yes \
-    PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
-
-# Update pip and install the required python packages globally
-ENV PATH="$PATH:/root/.local/bin"
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
-
-
 
 
 

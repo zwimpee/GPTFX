@@ -9,9 +9,11 @@ services:
       - config_container
       - auto-gpt
       - output_container
-    build: .
+    build:
+      dockerfile: Dockerfile
+      context: ../
     volumes:
-      - ./:/app
+      - ./:/app/gptfx
     profiles: [
       "exclude-from-up",
     ]
@@ -19,8 +21,12 @@ services:
   auto-gpt:
     depends_on:
       - redis
-    build: ./
+    build:
+      dockerfile: ./Dockerfile
+      context: ../
     tty: true
+    env_file:
+      - ../.env
     environment:
       MEMORY_BACKEND: ${MEMORY_BACKEND:-redis}
       REDIS_HOST: ${REDIS_HOST:-redis}
