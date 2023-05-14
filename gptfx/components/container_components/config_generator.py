@@ -24,9 +24,7 @@ from autogpt import configurator
 @click.option('--browser_name', type=str, required=False)
 @click.option('--allow_downloads', type=bool, required=False)
 @click.option('--skip_news', type=bool, required=False)
-@click.pass_context
 def main(
-    ctx: click.Context = None,
     pipeline_name = None,
     pipeline_root: str = None,
     continuous: bool = None,

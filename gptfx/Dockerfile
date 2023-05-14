@@ -1,8 +1,5 @@
-# 'dev' or 'release' container build
-ARG BUILD_TYPE=dev
-
 # AutoGPT base
-FROM significantgravitas/auto-gpt:latest as autogpt-base
+FROM zwimpee/auto-gpt:latest as autogpt-base
 
 # GPTFX base with Python 3.8
 FROM python:3.8-slim as gptfx_base

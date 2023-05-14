@@ -40,3 +40,4 @@ ONBUILD COPY scripts/ ./scripts
 ONBUILD COPY plugins/ ./plugins
 
 FROM autogpt-${BUILD_TYPE} AS auto-gpt
+

@@ -37,7 +37,7 @@ config_generator_component = create_container_component(
 
 autogpt_component = create_container_component(
     name='autogpt_component',
-    image='auto-gpt:latest',
+    image='zwimpee/auto-gpt:latest',
     command=[
         'python',
         '-m',
@@ -49,9 +49,7 @@ autogpt_component = create_container_component(
     outputs={
         'data': types.artifact.json_utils.JsonableType,
     },
-    parameters={
-        # 'pipeline_config': str,
-    }
+    parameters={}
 )
 
 output_processing_component = create_container_component(
