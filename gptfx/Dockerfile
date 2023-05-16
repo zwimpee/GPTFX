@@ -1,9 +1,7 @@
+# Use a Miniconda base image
+FROM continuumio/miniconda3:latest as gptfx-base
 
-
-# Use a Python 3.8 slim image as the base image
-FROM python:3.8-slim as gptfx-base
-
-# Install browsers
+# Update the base image
 RUN apt-get update && apt-get install -y \
     chromium-driver firefox-esr \
     ca-certificates
@@ -14,22 +12,6 @@ RUN apt-get install -y curl jq wget git
 # Install gcc and build-essential
 RUN apt-get install -y gcc build-essential
 
-# Set environment variables
-ENV PIP_NO_CACHE_DIR=yes \
-    PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
-
-# Set the Python path to include packages installed by pip
-ENV PATH="$PATH:/root/.local/bin"
-
-# Copy the requirements.txt file to the Docker image
-COPY requirements.txt .
-
-# Install the required python packages globally
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Use the base image to create a new build stage called gptfx-dev
-FROM gptfx-base as gptfx-dev
 
 # Set the working directory to /app
 WORKDIR /app
@@ -37,12 +19,14 @@ WORKDIR /app
 # Copy the entire contents of the current directory to the Docker image
 COPY . .
 
-# Install the gptfx package
-RUN pip install .
+# Use Conda to create a new environment from the environment.yml file
+RUN conda env create -f environment.yml && conda activate gptfx
 
-# Use the gptfx-dev build stage to create the final Docker image
-FROM gptfx-dev AS gptfx
+# Activate the new environment
+# SHELL ["conda", "run", "-n", "gptfx", "/bin/bash", "-c"]
+
+# Install the app into the Conda environment
+RUN conda develop .
 
 # Set the entrypoint
 ENTRYPOINT ["python", "-m", "gptfx"]
-
