@@ -7,7 +7,7 @@ import gptfx.pipeline.configs
 
 config_generator_component = create_container_component(
     name='config_gen_component',
-    image='config_generator_component:latest',
+    image='zwimpee/config_generator_component:latest',
     command=[
         'python',
         'gptfx',
@@ -19,10 +19,7 @@ config_generator_component = create_container_component(
         '--metadata_root', InputValuePlaceholder('metadata_root'),
         '--pipeline_config_uri', OutputUriPlaceholder('pipeline_config'),
     ],
-    inputs={
-        'autogpt_config': autogpt.config.Config,
-        'ai_config': autogpt.config.AIConfig,
-    },
+    inputs={},
     outputs={
         'pipeline_config': gptfx.pipeline.configs.Config,
     },
@@ -53,7 +50,7 @@ autogpt_component = create_container_component(
 )
 
 output_processing_component = create_container_component(
-    name='output_processing_component',
+    name='zwimpee/output_processing_component',
     image='output_processing_component:latest',
     command=[
         'python',

@@ -1,40 +1,11 @@
 version: "3.9"
 services:
   gptfx:
-    depends_on:
-      - config_container
-      - auto-gpt
-      - output_container
-    build: .
+    build: ./
     volumes:
       - ./:/app
-  config_container:
-    build: .
-    command: [
-      "python",
-      "-m",
-      "config_generator.py"
-    ]
-  auto-gpt:
-    build: .
-    depends_on:
-      - config_container
-    command: [
-        "python",
-        "-m",
-        "auto-gpt"
-      ]
-  output_container:
-    depends_on:
-      - auto-gpt
-    build: .
-    volumes:
-      - ./:/app
-    command: [
-      "python",
-      "-m",
-      "output_processing.py"
-    ]
-  redis:
-    image: "redis/redis-stack-server:latest"
+    env_file:
+      - .env
+
+
 

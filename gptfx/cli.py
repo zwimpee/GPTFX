@@ -4,7 +4,7 @@ from typing import Any, Dict
 import click
 
 
-@click.group(invoke_without_command=True)
+@click.command()
 @click.option(
     "--pipeline_name",
     default=None,
@@ -30,16 +30,13 @@ import click
     default=None,
     help="Config file to use.",
 )
-
-@click.pass_context
 def main(
     ctx: click.Context = None,
     pipeline_name: str = None,
     pipeline_root: str = None,
     data_root: str = None,
     metadata_root: str = None,
-    config: Any = None,
-    **kwargs: Dict[str, Any]
+    config: str = None
 ) -> None:
     """
     Welcome to GPTFX, an experimental extension of Auto-GPT utilizing the TensorFlow Extended (TFX) framework to manage Agents and Pipelines.
@@ -53,8 +50,7 @@ def main(
             pipeline_root,
             data_root,
             metadata_root,
-            config,
-            **kwargs,
+            config
         )
 
 

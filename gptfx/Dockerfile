@@ -1,73 +1,48 @@
-# AutoGPT base
-FROM zwimpee/auto-gpt:latest as autogpt-base
 
-# GPTFX base with Python 3.8
-FROM python:3.8-slim as gptfx_base
 
-WORKDIR /app
+# Use a Python 3.8 slim image as the base image
+FROM python:3.8-slim as gptfx-base
 
-# Copy the entire content from AutoGPT base
-COPY --from=autogpt-base . ./autogpt
+# Install browsers
+RUN apt-get update && apt-get install -y \
+    chromium-driver firefox-esr \
+    ca-certificates
 
-# Copy the requirements.txt file into the image
-COPY requirements.txt .
+# Install utilities
+RUN apt-get install -y curl jq wget git
+
+# Install gcc and build-essential
+RUN apt-get install -y gcc build-essential
 
 # Set environment variables
 ENV PIP_NO_CACHE_DIR=yes \
     PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PATH="$PATH:/root/.local/bin"
+    PYTHONDONTWRITEBYTECODE=1
 
-# Update and install build tools
-RUN apt-get update && apt-get install -y \
-    gcc \
-    build-essential \
-    --no-install-recommends \
- && rm -rf /var/lib/apt/lists/*
+# Set the Python path to include packages installed by pip
+ENV PATH="$PATH:/root/.local/bin"
 
-# Update pip and install the required python packages globally
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Copy the requirements.txt file to the Docker image
+COPY requirements.txt .
 
-# Copy the app folder into the image
+# Install the required python packages globally
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Use the base image to create a new build stage called gptfx-dev
+FROM gptfx-base as gptfx-dev
+
+# Set the working directory to /app
+WORKDIR /app
+
+# Copy the entire contents of the current directory to the Docker image
 COPY . .
 
+# Install the gptfx package
+RUN pip install .
 
-# Container components
-FROM gptfx_base as container_component_base
+# Use the gptfx-dev build stage to create the final Docker image
+FROM gptfx-dev AS gptfx
 
-WORKDIR /app
+# Set the entrypoint
+ENTRYPOINT ["python", "-m", "gptfx"]
 
-COPY /usr/local/lib/python3.8/site-packages/ /usr/local/lib/python3.8/site-packages/
-
-WORKDIR /app/gptfx/components/container_components
-
-# Config generator component
-FROM container_component_base as config_generator_component
-COPY container_components/config_generator.py .
-ENTRYPOINT ["python", "config_generator.py"]
-
-# Output processing component
-FROM container_component_base as output_processing_component
-COPY container_components/output_processing_component.py .
-ENTRYPOINT ["python", "output_processing_component.py"]
-
-# Dev build - include everything
-FROM gptfx_base as gptfx-dev
-ONBUILD COPY . ./app
-
-# Release build - include bare minimum
-FROM gptfx_base as gptfx-release
-
-# Remove unneeded items from requirements and install
-RUN sed -i '/Items below this point will not be included in the Docker Image/,$d' requirements.txt && \
-	pip install --no-cache-dir -r requirements.txt
-
-# Copy needed directories
-ONBUILD COPY gptfx/ ./app/gptfx
-ONBUILD COPY scripts/ ./app/scripts
-ONBUILD COPY plugins/ ./app/plugins
-
-# Final image
-FROM gptfx-${BUILD_TYPE} AS gptfx
-WORKDIR /app
