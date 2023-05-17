@@ -1,10 +1,7 @@
-
-import os
-
 import click
 import ml_metadata.metadata_store.metadata_store
-from absl import logging
 import tensorflow as tf
+from absl import logging
 from ml_metadata.proto import metadata_store_pb2
 
 

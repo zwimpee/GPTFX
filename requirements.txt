@@ -1,4 +1,6 @@
+#./requirements.txt
 tfx==1.12.0
 tensorflow
 apache-beam[gcp]
 click
+langchain

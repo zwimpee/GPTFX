@@ -15,23 +15,38 @@ GPTFX
 │   │   ├── run_pipeline.py
 │   ├── components
 │   │   ├── __init__.py
-│   │   ├── container_components
+│   │   ├── agents
 │   │   │   ├── __init__.py
-│   │   │   ├── config_generator.py
-│   │   │   └── output_processing.py
-│   │   └── transform_components
+│   │   │   ├── autogpt
+│   │   │   ├── langchain
+│   │   │   └── openai
+│   │   ├── configs
+│   │   │   ├── __init__.py
+│   │   │   └── config.py
+│   │   └── models
 │   │       ├── __init__.py
-│   │       └── autogpt_utils.py
-│   └── pipeline
+│   │       ├── model.py
+│   │       └── train.py
+│   ├── pipeline
+│   │   ├── __init__.py
+│   │   ├── configs.py
+│   │   └── pipeline.py
+│   └── utils
 │       ├── __init__.py
-│       ├── configs.py
-│       └── pipeline.py
-├── .env
+│       ├── autogpt_utils.py
+│       ├── openai_utils.py
+│       └── tfx_utils.py
+├── logs
+├── scripts
+│   ├── conda_cleanup.ps1
+│   └── project_file_tree.ps1
 ├── docker-compose.yml
 ├── Dockerfile
 ├── README.md
 ├── environment.yml
-└── requirements.txt
+├── requirements.txt
+└── setup.py
+
 ```
 
 # Technologies Used
@@ -42,7 +57,7 @@ GPTFX utilizes a range of technologies and frameworks, including:
 - **Docker**: The containerization platform for building and deploying container images, ensuring consistent and reproducible execution environments.
 - **Tensorflow** and **TFX**: Core frameworks for building and running machine learning pipelines, offering data processing, model training, and model serving capabilities.
 
-Getting Started
+# Getting Started
 To get started with GPTFX, follow these steps:
 
 1. Clone the GPTFX repository: Begin by cloning the GPTFX repository to your local machine:
@@ -58,23 +73,46 @@ To get started with GPTFX, follow these steps:
     ```conda activate gptfx```
 
 5. Using conda-build, install the application into the conda environment:
-    ```conda develop .```
+   ```conda develop .```
 
 6. Compile images that will be used to run the application:
-   - **Auto-GPT**:  
+    - **Pipeline Components**:
+        - **Configuration generation**:
+          ```docker build -t <name of image> <path to Dockerfile>```
+        - **LLM Agent**:
+          ```docker build -t <name of image> <path to Dockerfile>```
+        - **Output data processing**:
+          ```docker build -t <name of image> <path to Dockerfile>```
 
-Install dependencies: Navigate to the project directory and use pip to install the necessary dependencies and libraries required for the project by running pip install -r requirements.txt.
+7. Run the application: Run the application using the following command:
+   ```python -m gptfx <command> <arguments>```
+   where:
+    - **command**: The command to execute. If left blank, the application will default to the run_pipeline command (via
+      the __main__.py/cli.py/run_pipeline.py files).
+    - **arguments**: The arguments to pass to the command. If left blank, the application will use default arguments.
 
-Create the Conda environment: Use conda env create -f environment.yml to create the Conda environment with the necessary dependencies.
+# Current Progress
 
-Build and deploy Docker containers: Build the Docker image with docker build -t gptfx . and then start the container with docker run -p 8000:8000 gptfx.
+- General project progress:
+    - [X] Define the project structure
+    - [X] Determine the MVP for the first iteration of the project
+    - [X] Create the initial project files
+    - [X] Create the initial Dockerfile
+    - [X] Create the initial environment.yml file
+    - [X] Create the initial requirements.txt file
+    - [X] Create the initial setup.py file
+    - [X] Create the initial README.md file
 
-Define TFX pipeline and components: Define the TFX pipeline and the corresponding components, including the container-based components, configuration generators, and output data processors.
+- MVP progress:
+    - [X] Create the initial pipeline components
+    - [X] Create the initial pipeline
+    - [X] Create the initial CLI
+    - [X] Create the initial Dockerfile
+    - [X] Create the initial environment.yml file
+    - [X] Create the initial requirements.txt file
+    - [X] Create the initial setup.py file
+    - [X] Create the initial README.md file
+    - [ ] Run the pipeline and explore the outputs
 
-Run the pipeline: Execute the TFX pipeline and monitor its execution and outputs.
-
-Current Progress
-Currently, the project is in the proof of concept stage. The development efforts are focused on creating container-based TFX components, a configuration generator component, and an output data processor component. These components aim to seamlessly integrate the LLM agent into the TFX pipeline, enabling the generation of a prompt for the agent, the execution of the agent pipeline, and the processing of the agent’s output.
-
-Contribution Guidelines
+# Contribution Guidelines
 Contributions to GPTFX are welcome! If you have any ideas, bug fixes, or new features to propose, please open an issue or submit a pull request in the repository. The project follows industry-standard practices for contributing, and detailed guidelines can be found in the CONTRIBUTING
