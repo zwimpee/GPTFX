@@ -1,11 +1,23 @@
-version: "3.9"
+#./docker-compose.yml
+version: '3.8'
 services:
   gptfx:
-    build: .
-    volumes:
-      - ./:/app
-    env_file:
-      - .env
-
-
-
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - config_generator
+      - llm_agent
+      - output_processing
+  config_generator:
+    build:
+      context: ./gptfx/components/agents/langchain/config_generator
+      dockerfile: Dockerfile
+  llm_agent:
+    build:
+      context: ./gptfx/components/agents/langchain/llm_agent
+      dockerfile: Dockerfile
+  output_processing:
+    build:
+      context: ./gptfx/components/agents/langchain/output_processing
+      dockerfile: Dockerfile
